@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 type TimeRange = 'shortTerm' | 'mediumTerm' | 'longTerm';
 
@@ -67,9 +68,9 @@ export default function Dashboard() {
 
   const getAllUniqueArtists = () => {
     if (!topItems) return [];
-    
+
     const artistMap = new Map<string, SpotifyArtist & { timeRanges: TimeRange[] }>();
-    
+
     const addArtistsFromTimeRange = (artists: SpotifyArtist[], timeRange: TimeRange) => {
       artists.forEach((artist) => {
         if (artistMap.has(artist.id)) {
@@ -87,7 +88,7 @@ export default function Dashboard() {
     addArtistsFromTimeRange(topItems.artists.longTerm, 'longTerm');
 
     // Convert map to array and sort by number of time ranges (most present first)
-    return Array.from(artistMap.values()).sort((a, b) => 
+    return Array.from(artistMap.values()).sort((a, b) =>
       b.timeRanges.length - a.timeRanges.length
     );
   };
@@ -110,8 +111,16 @@ export default function Dashboard() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-8">Your Spotify Top Items</h1>
-      
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">Your Spotify Top Items</h1>
+        <Link
+          href="/lineup-searcher"
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors"
+        >
+          Find Festival Matches
+        </Link>
+      </div>
+
       <div className="grid gap-8 md:grid-cols-2">
         <section>
           <h2 className="text-xl font-semibold mb-4">Top Tracks</h2>
