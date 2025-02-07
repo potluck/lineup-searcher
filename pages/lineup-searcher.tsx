@@ -85,7 +85,7 @@ export default function LineupSearcher() {
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="text-gray-700 prose prose-sm max-w-none">
               <h1 className="text-xl font-bold mb-4">Festival Analysis</h1>
-              <h2 className="text-lg font-semibold mb-2">Top Artists You'll Love</h2>
+              <h2 className="text-lg font-semibold mb-2">Top Artists You will Love</h2>
               <div className="list-disc list-inside space-y-2 mb-4">
                 {recommendation.split('\n').map((line, index) => (
                   <p key={index} className="ml-4">• {line.trim()}</p>
