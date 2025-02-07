@@ -92,7 +92,7 @@ Please provide a list of festival artists they might enjoy based on their music 
 
     const completion = await openai.chat.completions.create({
       messages: [
-        { role: "system", content: "As a music expert, analyze this music fan's top artists and recommend which artists, particularly those that are lesser-known, they should see at an upcoming festival. Format it as an HTML list." },
+        { role: "system", content: "As a music expert, analyze this music fan's top artists and recommend which artists, particularly those that are lesser-known, they should see at an upcoming festival. Format it with line breaks." },
         { role: "user", content: prompt },
       ],
       model: "gpt-3.5-turbo",

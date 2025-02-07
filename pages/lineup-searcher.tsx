@@ -36,18 +36,10 @@ export default function LineupSearcher() {
       });
 
       const data = await response.json();
-      // Format the recommendation with proper HTML tags
-      const formattedRecommendation = `
-        <h1 class="text-xl font-bold mb-4">Festival Analysis</h1>
-        <h2 class="text-lg font-semibold mb-2">Top Artists You'll Love</h2>
-        <ul class="list-disc list-inside space-y-2 mb-4">
-          ${data.recommendation}
-        </ul>
-      `;
-      setRecommendation(formattedRecommendation);
+      setRecommendation(data.recommendation);
     } catch (error) {
       console.error('Error:', error);
-      setRecommendation('<p class="text-red-500">Sorry, there was an error analyzing the lineup.</p>');
+      setRecommendation('Sorry, there was an error analyzing the lineup.');
     } finally {
       setLoading(false);
     }
@@ -91,10 +83,15 @@ export default function LineupSearcher() {
 
         {recommendation && !loading && (
           <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div
-              className="text-gray-700 prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: recommendation }}
-            />
+            <div className="text-gray-700 prose prose-sm max-w-none">
+              <h1 className="text-xl font-bold mb-4">Festival Analysis</h1>
+              <h2 className="text-lg font-semibold mb-2">Top Artists You'll Love</h2>
+              <div className="list-disc list-inside space-y-2 mb-4">
+                {recommendation.split('\n').map((line, index) => (
+                  <p key={index} className="ml-4">• {line.trim()}</p>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
