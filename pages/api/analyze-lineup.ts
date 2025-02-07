@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { spotifyApi } from '../../lib/spotify';
 import OpenAI from 'openai';
 import { checkExistingResponse, saveResponse } from '../../lib/db';
+import { PromptLayer } from "promptlayer";
+
 
 
 export const FESTIVALS: Record<string, { name: string; id: string; artists: string[] }> = {
@@ -46,9 +48,15 @@ export const FESTIVALS: Record<string, { name: string; id: string; artists: stri
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+
+  const promptLayerClient = new PromptLayer();
+
+  // const openai = new OpenAI({
+  //   apiKey: process.env.OPENAI_API_KEY,
+  // });
+  const OpenAI = promptLayerClient.OpenAI;
+  const openai = new OpenAI();
+  
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -81,25 +89,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const topArtists = await spotifyApi.getMyTopArtists({ limit: 25 });
 
-    const prompt = `User's top artists: ${topArtists.body.items.map(artist => artist.name).join(', ')}
+    const inputVars = {
+      topArtists: topArtists.body.items.map(artist => artist.name).join(', '),
+      festivalName: festival.name,
+      festivalArtists: festival.artists.join(', ')
+    }
 
-Festival: ${festival.name}
-Festival lineup: ${festival.artists.join(', ')}
+//     const prompt = `User's top artists: ${inputVars.top_artists}
 
-Please provide a list of festival artists they might enjoy based on their music taste. Include one set of artists that they already know, and another of ones they don't. Explain the connection to their favorite artists, for the ones they don't already know. Keep the response under 400 words.`;
+// Festival: ${inputVars.festival_name}
+// Festival lineup: ${inputVars.festival_lineup}
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: "As a music expert, analyze this music fan's top artists and recommend which artists, particularly those that are lesser-known, they should see at an upcoming festival. Format it with line breaks." },
-        { role: "user", content: prompt },
-      ],
-      model: "gpt-3.5-turbo",
-      temperature: 0.7,
-      max_tokens: 300,
-    });
+// Please provide a list of festival artists they might enjoy based on their music taste. Include one set of artists that they already know, and another of ones they don't. Explain the connection to their favorite artists, for the ones they don't already know. Keep the response under 400 words.`;
 
-    const recommendation = completion.choices[0]?.message?.content ||
-      "Sorry, I couldn't generate a recommendation at this time.";
+//     const completion = await openai.chat.completions.create({
+//       messages: [
+//         { role: "system", content: "As a music expert, analyze this music fan's top artists and recommend which artists, particularly those that are lesser-known, they should see at an upcoming festival. Format it with line breaks." },
+//         { role: "user", content: prompt },
+//       ],
+//       model: "gpt-3.5-turbo",
+//       temperature: 0.7,
+//       max_tokens: 300,
+//     });
+  const response = await promptLayerClient.run({
+    promptName: "Lineup Searcher", 
+    inputVariables: inputVars,
+  });
+
+  const recommendation = (response as { raw_response: { choices: [{ message: { content: string } }] } }).raw_response.choices[0].message.content;
+
+    // const recommendation = completion.choices[0]?.message?.content ||
+    //   "Sorry, I couldn't generate a recommendation at this time.";
 
     // Save the new response
     await saveResponse(userId, festivalId, recommendation);
