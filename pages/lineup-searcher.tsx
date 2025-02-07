@@ -1,30 +1,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import { FESTIVALS } from './api/analyze-lineup';
 
-// This is our temporary festival data structure
+// Add interface for Festival type
 interface Festival {
   id: string;
   name: string;
-  artists: string[];
 }
 
-const FESTIVALS: Festival[] = [
-  {
-    id: 'coachella-2024',
-    name: 'Coachella 2024',
-    artists: ['Tyler, The Creator', 'Doja Cat', 'Lana Del Rey', 'No Doubt', 'Justice', 'Blur']
-  },
-  {
-    id: 'glastonbury-2024',
-    name: 'Glastonbury 2024',
-    artists: ['Coldplay', 'Dua Lipa', 'SZA', 'Foo Fighters', 'The Killers']
-  }
-];
+// Add type annotation for FESTIVALS
+const festivals: Festival[] = Object.values(FESTIVALS).map(festival => ({
+  id: festival.id,
+  name: festival.name
+}));
 
 export default function LineupSearcher() {
   const [selectedFestival, setSelectedFestival] = useState<string>('');
   const [recommendation, setRecommendation] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [showLineup, setShowLineup] = useState(false);
 
   const handleFestivalSelect = async (festivalId: string) => {
     setSelectedFestival(festivalId);
@@ -42,10 +36,18 @@ export default function LineupSearcher() {
       });
 
       const data = await response.json();
-      setRecommendation(data.recommendation);
+      // Format the recommendation with proper HTML tags
+      const formattedRecommendation = `
+        <h1 class="text-xl font-bold mb-4">Festival Analysis</h1>
+        <h2 class="text-lg font-semibold mb-2">Top Artists You'll Love</h2>
+        <ul class="list-disc list-inside space-y-2 mb-4">
+          ${data.recommendation}
+        </ul>
+      `;
+      setRecommendation(formattedRecommendation);
     } catch (error) {
       console.error('Error:', error);
-      setRecommendation('Sorry, there was an error analyzing the lineup.');
+      setRecommendation('<p class="text-red-500">Sorry, there was an error analyzing the lineup.</p>');
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ export default function LineupSearcher() {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex items-center gap-4 mb-8">
-        <Link 
+        <Link
           href="/dashboard"
           className="text-sm text-gray-600 hover:text-gray-900"
         >
@@ -75,7 +77,7 @@ export default function LineupSearcher() {
             onChange={(e) => handleFestivalSelect(e.target.value)}
           >
             <option value="">Choose a festival...</option>
-            {FESTIVALS.map((festival) => (
+            {festivals.map((festival) => (
               <option key={festival.id} value={festival.id}>
                 {festival.name}
               </option>
@@ -89,8 +91,33 @@ export default function LineupSearcher() {
 
         {recommendation && !loading && (
           <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h2 className="text-lg font-semibold mb-2">Your Personalized Recommendation</h2>
-            <p className="text-gray-700">{recommendation}</p>
+            <div
+              className="text-gray-700 prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: recommendation }}
+            />
+          </div>
+        )}
+
+        {selectedFestival && (
+          <div className="mt-4">
+            <button
+              onClick={() => setShowLineup(!showLineup)}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {showLineup ? 'Hide Full Lineup' : 'Show Full Lineup'}
+            </button>
+            {showLineup && (
+              <div className="mt-2 bg-white p-4 rounded-lg shadow-sm border">
+                <h3 className="text-lg font-semibold mb-2">Full Lineup</h3>
+                <ul className="list-disc list-inside space-y-1">
+                  {FESTIVALS[selectedFestival].artists.map((artist: string) => (
+                    <li key={artist} className="text-gray-700">
+                      {artist}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </div>

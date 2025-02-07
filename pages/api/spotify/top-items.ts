@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     spotifyApi.setAccessToken(access_token);
-    
+
     const [
       tracksResponse,
       shortTermArtists,
@@ -18,14 +18,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       longTermArtists
     ] = await Promise.all([
       spotifyApi.getMyTopTracks({ limit: 10 }),
-      spotifyApi.getMyTopArtists({ limit: 50, time_range: 'short_term' }),
-      spotifyApi.getMyTopArtists({ limit: 50, time_range: 'medium_term' }),
-      spotifyApi.getMyTopArtists({ limit: 50, time_range: 'long_term' }),
+      spotifyApi.getMyTopArtists({ limit: 25, time_range: 'short_term' }),
+      spotifyApi.getMyTopArtists({ limit: 25, time_range: 'medium_term' }),
+      spotifyApi.getMyTopArtists({ limit: 25, time_range: 'long_term' }),
     ]);
 
     console.log("short term: ", shortTermArtists.body.items.length);
     console.log("medium term: ", mediumTermArtists.body.items.length);
-    console.log("long term: ", longTermArtists.body.items.length );
+    console.log("long term: ", longTermArtists.body.items.length);
 
 
     res.status(200).json({

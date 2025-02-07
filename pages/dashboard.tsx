@@ -42,29 +42,21 @@ export default function Dashboard() {
   const [topItems, setTopItems] = useState<TopItems | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // const getArtistTimeRanges = (artistId: string): TimeRange[] => {
-  //   const ranges: TimeRange[] = [];
-  //   if (topItems?.artists.shortTerm.some((a) => a.id === artistId)) ranges.push('shortTerm');
-  //   if (topItems?.artists.mediumTerm.some((a) => a.id === artistId)) ranges.push('mediumTerm');
-  //   if (topItems?.artists.longTerm.some((a) => a.id === artistId)) ranges.push('longTerm');
-  //   return ranges;
-  // };
+  const getBadgeColor = (range: TimeRange) => {
+    switch (range) {
+      case 'shortTerm': return 'bg-blue-500';
+      case 'mediumTerm': return 'bg-purple-500';
+      case 'longTerm': return 'bg-green-500';
+    }
+  };
 
-  // const getBadgeColor = (range: TimeRange) => {
-  //   switch (range) {
-  //     case 'shortTerm': return 'bg-blue-500';
-  //     case 'mediumTerm': return 'bg-purple-500';
-  //     case 'longTerm': return 'bg-green-500';
-  //   }
-  // };
-
-  // const getBadgeText = (range: TimeRange) => {
-  //   switch (range) {
-  //     case 'shortTerm': return '4W';
-  //     case 'mediumTerm': return '6M';
-  //     case 'longTerm': return 'ALL';
-  //   }
-  // };
+  const getBadgeText = (range: TimeRange) => {
+    switch (range) {
+      case 'shortTerm': return '4W';
+      case 'mediumTerm': return '6M';
+      case 'longTerm': return 'ALL-TIME';
+    }
+  };
 
   const getAllUniqueArtists = () => {
     if (!topItems) return [];
@@ -158,7 +150,7 @@ export default function Dashboard() {
                 />
                 <div className="flex flex-col">
                   <p className="font-medium">{artist.name}</p>
-                  {/* <div className="flex gap-1 mt-1">
+                  <div className="flex gap-1 mt-1">
                     {artist.timeRanges.map((range: TimeRange) => (
                       <span
                         key={range}
@@ -167,7 +159,7 @@ export default function Dashboard() {
                         {getBadgeText(range)}
                       </span>
                     ))}
-                  </div> */}
+                  </div>
                 </div>
               </div>
             ))}
