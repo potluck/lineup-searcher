@@ -1,4 +1,4 @@
-import { spotifyApi, queryParamString } from "../../../lib/spotify";
+import { queryParamString } from "../../../lib/spotify";
 import { NextApiRequest, NextApiResponse } from 'next'; 
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
