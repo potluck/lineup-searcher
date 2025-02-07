@@ -41,6 +41,7 @@ interface TopItems {
 export default function Dashboard() {
   const [topItems, setTopItems] = useState<TopItems | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showBadges, setShowBadges] = useState(true);
 
   const getBadgeColor = (range: TimeRange) => {
     switch (range) {
@@ -137,7 +138,15 @@ export default function Dashboard() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-4">Top Artists</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Top Artists</h2>
+            <button
+              onClick={() => setShowBadges(!showBadges)}
+              className="text-sm text-gray-600 hover:text-gray-800"
+            >
+              {showBadges ? 'Hide Badges' : 'Show Badges'}
+            </button>
+          </div>
           <div className="space-y-4">
             {getAllUniqueArtists().map((artist: SpotifyArtist & { timeRanges: TimeRange[] }) => (
               <div key={artist.id} className="flex items-center gap-4">
@@ -150,16 +159,18 @@ export default function Dashboard() {
                 />
                 <div className="flex flex-col">
                   <p className="font-medium">{artist.name}</p>
-                  <div className="flex gap-1 mt-1">
-                    {artist.timeRanges.map((range: TimeRange) => (
-                      <span
-                        key={range}
-                        className={`${getBadgeColor(range)} text-white text-xs px-2 py-0.5 rounded-full`}
-                      >
-                        {getBadgeText(range)}
-                      </span>
-                    ))}
-                  </div>
+                  {showBadges && (
+                    <div className="flex gap-1 mt-1">
+                      {artist.timeRanges.map((range: TimeRange) => (
+                        <span
+                          key={range}
+                          className={`${getBadgeColor(range)} text-white text-xs px-2 py-0.5 rounded-full`}
+                        >
+                          {getBadgeText(range)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
