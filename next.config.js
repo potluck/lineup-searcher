@@ -9,6 +9,22 @@ const nextConfig = {
   images: {
     domains: ['i.scdn.co'],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Client-side specific configuration
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'async_hooks': false,
+        'fs': false,
+        'net': false,
+        'tls': false,
+        'perf_hooks': false,
+        'child_process': false,
+        'worker_threads': false
+      };
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig 

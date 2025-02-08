@@ -1,6 +1,8 @@
+'use client'
 import { useState } from 'react';
 import Link from 'next/link';
-import { FESTIVALS } from './api/analyze-lineup';
+import { FESTIVALS } from '../lib/festivals';
+import { analyzeLineup } from '../app/actions/analyze-lineup';
 
 // Add interface for Festival type
 interface Festival {
@@ -25,18 +27,8 @@ export default function LineupSearcher() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/analyze-lineup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          festivalId,
-        }),
-      });
-
-      const data = await response.json();
-      setRecommendation(data.recommendation);
+      const result = await analyzeLineup(festivalId);
+      setRecommendation(result.recommendation);
     } catch (error) {
       console.error('Error:', error);
       setRecommendation('Sorry, there was an error analyzing the lineup.');
