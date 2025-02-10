@@ -28,6 +28,7 @@ export default function LineupSearcher() {
 
     try {
       const result = await analyzeLineup(festivalId);
+      console.log("result: ", result);
       setRecommendation(result.recommendation);
     } catch (error) {
       console.error('Error:', error);
